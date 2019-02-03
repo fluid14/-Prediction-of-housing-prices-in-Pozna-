@@ -8,11 +8,11 @@ rooms = 0
 size = 0
 floor = 0
 district = ''
+dataset = []
+prices = []
 count = 0
 
-# pobranie bazy mieszkań do uczenia
 df = pd.read_csv('http://djo.com.pl/databases/homdbcsv/poz.csv')
-# districtEx = pd.read_csv('http://djo.com.pl/databases/homdbcsv/district-poz.csv')
 df.drop(['Id', 'Description'], axis=1, inplace=True)
 
 while True:
@@ -42,18 +42,7 @@ while True:
   else:
      break
 
-
-while True:
-    district = input("Jaka dzielnica ? ")
-    if type(district) == type('district'):
-        break
-    else:
-        print('nie')
-        continue
-
-
-# district = input("Jaka dzielnica ? ")
-
+district = input("Jaka dzielnica ? ")
 
 print('\n\n\nWprowadzone dane: \n')
 print('Pokoje: %d' % (rooms))
@@ -61,7 +50,6 @@ print('Wielkośc mieszkania: %d' % (size))
 print('Piętro: %d' % (floor))
 print('Dzielnica: %s' % (district))
 print('\nObliczam!')
-
 
 districtEx = ['antoninek', 'dębiec', 'zieliniec', 'kobylepole', 'chartowo', 'kotowo', 'główna', 'głuszyna', 'górczyn',
               'jeżyce', 'junikowo', 'krzesiny', 'krzyżowniki', 'smochowice', 'morasko', 'naramowice', 'ogrody',
@@ -78,21 +66,17 @@ while count <= 4999:
     districtFlat[count] = result
     count += 1
 
-
 encoder = preprocessing.LabelEncoder()
 encoder.fit(districtFlat)
 
-features = []
-labels = []
-
 count = 0
 while count <= 4999:
-    features.append([df.iloc[count][1], int(df.iloc[count][2]), df.iloc[count][3], int(encoder.transform([districtFlat[count]]))])
-    labels.append(df.iloc[count][0])
+    dataset.append([df.iloc[count][1], int(df.iloc[count][2]), df.iloc[count][3], int(encoder.transform([districtFlat[count]]))])
+    prices.append(df.iloc[count][0])
     count += 1
 
 clf = tree.DecisionTreeClassifier()
-clf.fit(features, labels)
+clf.fit(dataset, prices)
 
 price = clf.predict([[rooms, size, floor, int(encoder.transform([district.lower()]))]])
 
